@@ -1,4 +1,4 @@
-<h1>MyAudioGallery for Typecho 1.3</h1>
+<h1>MyMusicAlbum for Typecho 1.3</h1>
 
 文章页面内使用短代码引用音乐专辑：<br>
 <br>
