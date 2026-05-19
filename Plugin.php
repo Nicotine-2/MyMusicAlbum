@@ -17,9 +17,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
     private static $styleLoaded = false;
     private static $uploadDir = null;
 
-    /**
-     * 获取当前配置的上传目录
-     */
     private static function getUploadDir()
     {
         if (self::$uploadDir !== null) {
@@ -40,27 +37,17 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         return $dir;
     }
     
-    /**
-     * 获取上传目录的完整服务器路径（支持软连接）
-     */
     private static function getUploadFullPath()
     {
         $path = __TYPECHO_ROOT_DIR__ . self::getUploadDir();
-        // 如果是软连接，返回真实路径
         return is_link($path) ? readlink($path) : $path;
     }
     
-    /**
-     * 获取上传目录的URL
-     */
     private static function getUploadUrl()
     {
         return rtrim(Helper::options()->siteUrl, '/') . '/' . trim(self::getUploadDir(), '/');
     }
     
-    /**
-     * 获取目录的真实路径（支持软连接）
-     */
     private static function getRealPath($path)
     {
         if (is_link($path)) {
@@ -101,7 +88,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         );
         $form->addInput($uploadDir);
         
-        // 显示当前路径信息
         $currentPath = self::getUploadDir();
         $fullPath = self::getUploadFullPath();
         $isWritable = is_writable($fullPath) ? '可写' : '不可写，请检查权限';
@@ -127,47 +113,67 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         if (!self::$styleLoaded) {
             self::$styleLoaded = true;
             echo '<style>
-/* 歌手卡片容器 */
+/* 歌手卡片容器 - 固定宽度256px，高度2:3比例 */
 .mag-singer-card {
     position: relative;
     display: inline-block;
     margin: 20px;
     text-align: center;
-}
-/* 歌手头像 - 256x256 圆角16px */
-.mag-singer-avatar {
     width: 256px;
-    height: 256px;
-    object-fit: cover;
-    display: block;
-    border-radius: 16px 16px 0 0;
-    pointer-events: none;
+    height: 384px;
+    overflow: hidden;
+    border-radius: 16px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #2a2a2e;
+    box-shadow: none;
+    outline: none;
 }
-/* 歌手名称 - 底部贴合，下圆角16px */
+/* 歌手名称 - 绝对定位在底部 */
 .mag-singer-name {
-    width: 256px;
-    height: 32px;
-    line-height: 32px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    line-height: 56px;
     text-align: center;
-    background: rgba(0,0,0,0.7);
-    border-radius: 0 0 16px 16px;
+    background: rgba(0,0,0,0.85);
     color: #fff;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     margin: 0;
-    padding: 0;
+    padding: 0 12px;
     pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 2;
 }
-/* 透明蒙版 - 完全覆盖整个卡片 */
+/* 圆角遮罩 - 修复白边 */
+.mag-singer-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: 5;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.3);
+}
+/* 透明蒙版 - 点击区域 */
 .mag-singer-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    width: 256px;
-    height: 288px;
+    width: 100%;
+    height: 100%;
     border-radius: 16px;
     cursor: pointer;
-    z-index: 999;
+    z-index: 10;
     background: transparent;
 }
 /* 模态框样式 */
@@ -206,7 +212,7 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
     font-weight: bold;
     margin-bottom: 30px;
 }
-/* 专辑网格布局 - 左对齐，自动换行 */
+/* 专辑网格布局 */
 .mag-albums-grid {
     display: flex;
     flex-wrap: wrap;
@@ -217,7 +223,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
     padding: 0;
     width: 100%;
 }
-/* 专辑项目 */
 .mag-album-item {
     width: 260px;
     margin: 0;
@@ -236,7 +241,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
             $parts = explode('-', $param);
             $count = count($parts);
             
-            // [MAG-音乐人] 格式 - 显示所有专辑
             if ($count === 1) {
                 $name = $parts[0];
                 $base = self::getUploadFullPath() . '/' . $name;
@@ -245,7 +249,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
                 }
             }
             
-            // [MAG-音乐人-专辑1,专辑2] 格式 - 显示指定专辑
             if ($count >= 2) {
                 $artist = $parts[0];
                 $albumPart = implode('-', array_slice($parts, 1));
@@ -264,7 +267,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
     
     private static function isArtist($path)
     {
-        // 获取真实路径（支持软连接）
         $realPath = self::getRealPath($path);
         $audioFiles = glob($realPath . '/*.{mp3,flac,wav,ogg,aac,m4a}', GLOB_BRACE);
         if (!empty($audioFiles)) return false;
@@ -311,8 +313,8 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         
         $title = htmlspecialchars($artist) . ' 的专辑';
         
-        $html = '<div class="mag-singer-card">';
-        $html .= '<img src="' . $avatarUrl . '" class="mag-singer-avatar" onerror="this.src=\'' . $baseUrl . '/default-avatar.jpg\'">';
+        // 使用背景图片方式，确保图片填满容器
+        $html = '<div class="mag-singer-card" style="background-image: url(\'' . $avatarUrl . '\');">';
         $html .= '<div class="mag-singer-name">' . htmlspecialchars($artist) . '</div>';
         $html .= '<div class="mag-singer-overlay" onclick="document.getElementById(\'' . $overlayId . '\').style.display=\'flex\';"></div>';
         $html .= '</div>';
@@ -330,7 +332,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
     {
         self::$id++;
         $id = self::$id;
-        $uploadDir = self::getUploadDir();
         $uploadFullPath = self::getUploadFullPath();
         $uploadUrl = self::getUploadUrl();
         
@@ -338,7 +339,6 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         $url = $uploadUrl . '/' . $album . '/';
         $albumName = $album;
         
-        // 支持软连接：获取真实路径
         $realBase = self::getRealPath($base);
         
         if (!is_dir($realBase) && strpos($album, '-') !== false) {
