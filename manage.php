@@ -5,8 +5,8 @@ include 'header.php';
 include 'menu.php';
 
 $options = Helper::options();
-$pluginConfig = $options->plugin('MyAudioGallery');
-$uploadDir = $pluginConfig->uploadDir ?: '/usr/uploads/MyAudioGallery';
+$pluginConfig = $options->plugin('MyMusicAlbum');
+$uploadDir = $pluginConfig->uploadDir ?: '/usr/uploads/MyMusicAlbum';
 $uploadPath = __TYPECHO_ROOT_DIR__ . $uploadDir;
 // 支持软连接：获取真实路径
 $uploadFullPath = is_link($uploadPath) ? readlink($uploadPath) : $uploadPath;
@@ -19,7 +19,7 @@ if (!is_dir($uploadFullPath) && !is_link($uploadPath)) {
 
 $currentArtist = isset($_GET['artist']) ? trim($_GET['artist']) : '';
 $currentAlbum = isset($_GET['album']) ? trim($_GET['album']) : '';
-$panelPath = 'MyAudioGallery/manage.php';
+$panelPath = 'MyMusicAlbum/manage.php';
 $currentUrl = $options->adminUrl . 'extending.php?panel=' . $panelPath;
 
 // 辅助函数：获取真实路径（支持软连接）

@@ -4,14 +4,14 @@ if (!defined('__TYPECHO_ROOT_DIR__')) exit;
 /**
  * 音乐专辑插件，文章使用短代码引用专辑 [MAG-歌手名称] [MAG-歌手名称-专辑1名称,专辑2名称] [MAG-专辑名称] for Typecho 1.3
  * 
- * @package MyAudioGallery
+ * @package MyMusicAlbum
  * @author Nicotine-2
  * @version 1.0.0
- * @link https://github.com/Nicotine-2/MyAudioGallery
+ * @link https://github.com/Nicotine-2/MyMusicAlbum
  */
-class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
+class MyMusicAlbum_Plugin implements Typecho_Plugin_Interface
 {
-    const DEFAULT_UPLOAD_DIR = '/usr/uploads/MyAudioGallery';
+    const DEFAULT_UPLOAD_DIR = '/usr/uploads/MyMusicAlbum';
     const BG_OPACITY = 0.8;
     private static $id = 0;
     private static $styleLoaded = false;
@@ -25,7 +25,7 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         
         try {
             $options = Helper::options();
-            $pluginConfig = $options->plugin('MyAudioGallery');
+            $pluginConfig = $options->plugin('MyMusicAlbum');
             $dir = isset($pluginConfig->uploadDir) && !empty($pluginConfig->uploadDir) 
                 ? trim($pluginConfig->uploadDir) 
                 : self::DEFAULT_UPLOAD_DIR;
@@ -64,7 +64,7 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
         if (!is_dir($dir) && !is_link($dir)) {
             @mkdir($dir, 0755, true);
         }
-        Helper::addPanel(1, 'MyAudioGallery/manage.php', '我的专辑', '管理专辑', 'administrator');
+        Helper::addPanel(1, 'MyMusicAlbum/manage.php', '我的专辑', '管理专辑', 'administrator');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx = array(__CLASS__, 'parse');
         Typecho_Plugin::factory('Widget_Archive')->header = array(__CLASS__, 'header');
         return '启动成功，存储目录：' . self::getUploadDir();
@@ -72,7 +72,7 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
 
     public static function deactivate()
     {
-        Helper::removePanel(1, 'MyAudioGallery/manage.php');
+        Helper::removePanel(1, 'MyMusicAlbum/manage.php');
         return '卸载成功';
     }
 
@@ -83,8 +83,8 @@ class MyAudioGallery_Plugin implements Typecho_Plugin_Interface
             null,
             self::DEFAULT_UPLOAD_DIR,
             '音乐存储目录',
-            '相对于网站根目录的路径，例如：/usr/uploads/MyAudioGallery<br>' .
-            '<span style="color:#ff6600;">⚠️ 注意：修改路径后，需要手动将原 MyAudioGallery 文件夹移动到新路径，如果没有请新建该目录并设置好读写权限(755)。</span>'
+            '相对于网站根目录的路径，例如：/usr/uploads/MyMusicAlbum<br>' .
+            '<span style="color:#ff6600;">⚠️ 注意：修改路径后，需要手动将原 MyMusicAlbum 文件夹移动到新路径，如果没有请新建该目录并设置好读写权限(755)。</span>'
         );
         $form->addInput($uploadDir);
         

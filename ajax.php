@@ -8,7 +8,7 @@ require_once __TYPECHO_ROOT_DIR__ . '/config.inc.php';
 Typecho_Plugin::factory('admin/common.php')->begin();
 Typecho_Widget::widget('Widget_User')->pass('administrator');
 
-$uploadDir = Typecho_Widget::widget('Widget_Options')->plugin('MyAudioGallery')->uploadDir ?: '/usr/uploads/MyAudioGallery';
+$uploadDir = Typecho_Widget::widget('Widget_Options')->plugin('MyMusicAlbum')->uploadDir ?: '/usr/uploads/MyMusicAlbum';
 $uploadFullPath = __TYPECHO_ROOT_DIR__ . $uploadDir;
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';
